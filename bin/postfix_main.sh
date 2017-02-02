@@ -1,3 +1,5 @@
+# taken from
+# https://blog.dantup.com/2016/04/setting-up-raspberry-pi-raspbian-jessie-to-send-email/
 sudo tee /etc/postfix/main.cf > /dev/null <<EOF
 
 # Where to read account aliases, used to map all emails onto one account
