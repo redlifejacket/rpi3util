@@ -1,6 +1,7 @@
 #!/bin/bash
 
-projdir=/home/pi/rpi3util_master
+touch /boot/ssh
+projdir=/home/pi/rpi3util-master
 cd $projdir
 runtime=$(date +%Y%m%d%H%M%S)
 tarfile_before=/tmp/etc_before_${runtime}.tar
