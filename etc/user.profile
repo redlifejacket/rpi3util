@@ -19,9 +19,9 @@ PS1="\[\033[0;32m\]✔ \[\033[0;33m\]\w\[\033[0;0m\] \n\[\033[0;37m\]$(date +%H:
 function setPrompt {
   if [ $(whoami) == "root" ]
   then
-    PS1="${PS1}#"
+    PS1="${PS1}# "
   else
-    PS1="${PS1}$"
+    PS1="${PS1}$ "
   fi
 }
 
