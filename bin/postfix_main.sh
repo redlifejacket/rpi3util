@@ -7,7 +7,7 @@ sudo tee /etc/postfix/main.cf > /dev/null <<EOF
 alias_maps = hash:/etc/aliases
 
 # This sets the hostname, which will be used for outgoing email
-myhostname = pi.dantup.com
+myhostname = rpi3-lite0
 
 # This is the mailserver to connect to deliver email
 # NOTE: This must be the MX server for the account you wish to deliver email to

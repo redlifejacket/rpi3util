@@ -26,11 +26,3 @@ iface wlan0 inet static
 	netmask 255.255.255.0
 	network 10.0.0.0
 	broadcast 10.0.0.255
-
-#iface wlan0 inet static
-	#address 192.168.42.1
-	#netmask 255.255.255.0
-	#network 192.168.42.0
-	#broadcast 192.168.42.255
-	#gateway 192.168.43.1
-
