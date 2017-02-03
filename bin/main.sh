@@ -52,17 +52,21 @@ echo "private_tar: ${private_tar}"
 createTar public_tar ${projdir} ${logdir} "public" "etc"
 echo "public_tar: ${public_tar}"
 
-[[ ! -d $etc_runtime ]] && mkdir $etc_runtime
-cd $etc_runtime
+[[ ! -d ${etc_runtime} ]] && mkdir ${etc_runtime}
+cd ${etc_runtime}
 tar xvf ${private_tar}
 tar xvf ${public_tar}
-ls -lR $etc_runtime
+ls -lR ${etc_runtime}
+cd ${etc_runtime}
+etc_runtime_base=$(basename ${etc_runtime})
+etc_runtime_tar=${etc_runtime}/${etc_runtime_base}.tar
+tar cvf ${etc_runtime_tar} etc
 
 touch /boot/ssh
-$projdir/bin/rpi3_ap_setup.sh
-$projdir/bin/adapter_passthrough.sh wlan1 eth0
-tar xvf $tarfile_after -C /
-$projdir/bin/postfix_main.sh
-$projdir/bin/postfix_aliases.sh
-$projdir/bin/postfix_test.sh
+${projdir}/bin/rpi3_ap_setup.sh
+${projdir}/bin/adapter_passthrough.sh wlan1 eth0
+${projdir}/bin/postfix_main.sh
+${projdir}/bin/postfix_aliases.sh
+${projdir}/bin/postfix_test.sh
 
+tar xvf ${etc_runtime_tar} -C /
