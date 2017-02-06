@@ -56,7 +56,6 @@ function getPrivateTar {
 
 function init {
   echo "executing init"
-  sudo -s 
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
   echo "enable_uart=1" >> /boot/config.txt
