@@ -11,6 +11,7 @@ runScripts_lck=${logdir}/runScripts.lck
 exec 3>&1 1>>${logfile} 2>&1
 
 function createTar {
+  echo "executing createTar"
   local __resultvar=$1
   local srcdir=$2
   local destdir=$3
@@ -22,9 +23,11 @@ function createTar {
   tar cvf ${tarfile} ${files}
   cd -
   eval $__resultvar="${tarfile}"
+  echo "completed createTar"
 }
 
 function getConcatenatedFileList {
+  echo "executing getConcatenatedFileList"
   local __resultvar=$1
   local tarfile1=$2
   local tarfile2=$3
@@ -32,9 +35,11 @@ function getConcatenatedFileList {
   [[ -f ${tarfile2} ]] && public_list=$(tar tf ${tarfile2} | grep -v "\/$")
   local flist="${private_list} ${public_list}"
   eval $__resultvar="${flist}"
+  echo "completed getConcatenatedFileList"
 }
 
 function getPrivateTar {
+  echo "executing getPrivateTar"
   local __resultvar=$1
   local privtar=""
   mountdir=/media/rpi3util
@@ -46,25 +51,31 @@ function getPrivateTar {
   fi
   createTar privtar ${mountdir}/private ${logdir} "private" "etc"
   eval $__resultvar="${privtar}"
+  echo "completed getPrivateTar"
 }
 
 function init {
+  echo "executing init"
   sudo -s 
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
+  echo "completed init"
 }
 
 function runScripts {
-  [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..."
+  echo "executing runScripts"
+  [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..." && return
   ${projdir}/bin/rpi3_ap_setup.sh
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
   ${projdir}/bin/postfix_main.sh
   ${projdir}/bin/postfix_aliases.sh
   ${projdir}/bin/postfix_test.sh
   touch ${runScripts_lck}
+  echo "completed runScripts"
 }
 
 function installEtcRuntimeTar {
+  echo "executing installEtcRuntimeTar"
   local privTar = $1
   local pubTar = $2
 
@@ -82,6 +93,7 @@ function installEtcRuntimeTar {
   echo "${etc_runtime_tar} created"
   tar xvf ${etc_runtime_tar} -C /
   echo "${etc_runtime_tar} installed"
+  echo "completed installEtcRuntimeTar"
 }
 
 # Main Program
