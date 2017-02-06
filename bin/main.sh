@@ -7,6 +7,7 @@ runtime=$(date +%Y%m%d%H%M%S)
 logfile="${logdir}/rpi3util_${runtime}.log"
 projdir=${homedir}/rpi3util-master
 etc_runtime=${logdir}/etc_${runtime}
+runScripts_lck=${logdir}/runScripts.lck
 exec 3>&1 1>>${logfile} 2>&1
 
 function createTar {
@@ -54,11 +55,13 @@ function init {
 }
 
 function runScripts {
+  [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..."
   ${projdir}/bin/rpi3_ap_setup.sh
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
   ${projdir}/bin/postfix_main.sh
   ${projdir}/bin/postfix_aliases.sh
   ${projdir}/bin/postfix_test.sh
+  touch ${runScripts_lck}
 }
 
 function installEtcRuntimeTar {
