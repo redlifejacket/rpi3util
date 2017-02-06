@@ -59,6 +59,7 @@ function init {
   sudo -s 
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
+  echo "enable_uart=1" >> /boot/config.txt
   echo "completed init"
 }
 
@@ -102,4 +103,4 @@ runScripts
 getPrivateTar private_tar
 createTar public_tar ${projdir} ${logdir} "public" "etc"
 installEtcRuntimeTar ${private_tar} ${public_tar}
-reboot
+#reboot
