@@ -37,14 +37,14 @@ function getConcatenatedFileList {
 function getPrivateTar {
   local __resultvar=$1
   local privtar=""
-  mountdir=/media/rpi3util/private
+  mountdir=/media/rpi3util
   if [ ! -d ${mountdir} ]
     then
     mkdir -p ${mountdir}
     echo "/dev/sda1 ${mountdir} vfat user,owner,utf8,rw,umask=000 0 0" >> /etc/fstab
     mount -a
   fi
-  createTar privtar ${mountdir} ${logdir} "private" "etc"
+  createTar privtar ${mountdir}/private ${logdir} "private" "etc"
   eval $__resultvar="${privtar}"
 }
 
