@@ -5,7 +5,7 @@ logdir=${homedir}/log
 [[ ! -d ${logdir} ]] && mkdir ${logdir}
 runtime=$(date +%Y%m%d%H%M%S)
 logfile="${logdir}/rpi3util_${runtime}.log"
-projdir=${homedir}/rpi3util-master
+projdir=${homedir}/rpi3util
 etc_runtime=${logdir}/etc_${runtime}
 runScripts_lck=${logdir}/runScripts.lck
 exec 3>&1 1>>${logfile} 2>&1
