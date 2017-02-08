@@ -1,6 +1,6 @@
 #!/bin/bash
 
-homedir=/home/pi
+homedir=${HOME}
 logdir=${homedir}/log
 [[ ! -d ${logdir} ]] && mkdir ${logdir}
 runtime=$(date +%Y%m%d%H%M%S)
@@ -56,6 +56,7 @@ function getPrivateTar {
 
 function init {
   echo "executing init"
+  [[ ! -z $1 ]] && echo -n "Setting hostname to $1" && echo "$1" > /etc/hostname
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
   echo "enable_uart=1" >> /boot/config.txt
@@ -97,7 +98,8 @@ function installEtcRuntimeTar {
 }
 
 # Main Program
-init
+[[ $# -eq 1 ]] && echo -n "Setting hostname to $1" && hostname=$1
+init $hostname
 runScripts
 getPrivateTar private_tar
 createTar public_tar ${projdir} ${logdir} "public" "etc"
