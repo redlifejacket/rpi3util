@@ -69,7 +69,7 @@ function init {
 function runScripts {
   echo "executing runScripts"
   [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..." && return
-  ${projdir}/bin/rpi3_ap_setup.sh bramble rpi3sg
+  ${projdir}/bin/rpi3_ap_setup.sh bramble1234 rpi3sg
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
   #${projdir}/bin/postfix_main.sh
   #${projdir}/bin/postfix_aliases.sh
