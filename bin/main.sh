@@ -56,7 +56,17 @@ function getPrivateTar {
 
 function init {
   echo "executing init"
-  [[ ! -z $1 ]] && echo -n "Setting hostname to $1" && echo "$1" > /etc/hostname
+  if [ -z $1 ]
+  then
+    hname=$1
+    echo -n "Setting hostname to ${hname}"
+    regex=$(eval "s/black-pearl/${hname}/")
+    perl -p -i -e "${regex}" /etc/hosts
+    perl -p -i -e "${regex}" /etc/hostname
+    /etc/init.d/hostname.sh
+    echo "Done"
+  fi
+
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
   echo "enable_uart=1" >> /boot/config.txt
@@ -66,7 +76,7 @@ function init {
 function runScripts {
   echo "executing runScripts"
   [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..." && return
-  ${projdir}/bin/rpi3_ap_setup.sh
+  ${projdir}/bin/rpi3_ap_setup.sh bramble rpi3sg
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
   ${projdir}/bin/postfix_main.sh
   ${projdir}/bin/postfix_aliases.sh
@@ -77,8 +87,8 @@ function runScripts {
 
 function installEtcRuntimeTar {
   echo "executing installEtcRuntimeTar"
-  local privTar = $1
-  local pubTar = $2
+  local privTar=$1
+  local pubTar=$2
 
   echo "private_tar: ${privTar}"
   echo "public_tar:  ${pubTar}"
