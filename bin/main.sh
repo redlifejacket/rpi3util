@@ -60,7 +60,7 @@ function init {
   then
     hname=$1
     echo -n "Setting hostname to ${hname}"
-    regex=$(eval "s/black-pearl/${hname}/")
+    regex=$("\"s/black-pearl/${hname}/\"")
     perl -p -i -e "${regex}" /etc/hosts
     perl -p -i -e "${regex}" /etc/hostname
     /etc/init.d/hostname.sh
