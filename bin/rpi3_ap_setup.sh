@@ -5,22 +5,22 @@
 #
 
 if [ "$EUID" -ne 0 ]
-	then echo "Must be root"
-	exit
+then echo "Must be root"
+  exit
 fi
 
 if [[ $# -lt 1 ]]; 
-	then echo "You need to pass a password!"
-	echo "Usage:"
-	echo "sudo $0 yourChosenPassword [apName]"
-	exit
+then echo "You need to pass a password!"
+  echo "Usage:"
+  echo "sudo $0 yourChosenPassword [apName]"
+  exit
 fi
 
 APPASS="$1"
 APSSID="rPi3"
 
 if [[ $# -eq 2 ]]; then
-	APSSID=$2
+  APSSID=$2
 fi
 
 apt-get remove --purge hostapd -y
@@ -65,15 +65,15 @@ sed -i -- 's/iface wlan0 inet manual//g' /etc/network/interfaces
 sed -i -- 's/    wpa-conf \/etc\/wpa_supplicant\/wpa_supplicant.conf//g' /etc/network/interfaces
 
 cat >> /etc/network/interfaces <<EOF
-	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
 # Added by rPi Access Point Setup
 allow-hotplug wlan0
 iface wlan0 inet static
-	address 10.0.0.1
-	netmask 255.255.255.0
-	network 10.0.0.0
-	broadcast 10.0.0.255
+  address 10.0.0.1
+  netmask 255.255.255.0
+  network 10.0.0.0
+  broadcast 10.0.0.255
 
 EOF
 

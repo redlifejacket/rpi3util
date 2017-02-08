@@ -8,6 +8,7 @@ logfile="${logdir}/rpi3util_${runtime}.log"
 projdir=${homedir}/rpi3util
 etc_runtime=${logdir}/etc_${runtime}
 runScripts_lck=${logdir}/runScripts.lck
+etcInstall_lck=${logdir}/etcInstall.lck
 exec 3>&1 1>>${logfile} 2>&1
 
 function createTar {
@@ -42,7 +43,7 @@ function getPrivateTar {
   echo "executing getPrivateTar"
   local __resultvar=$1
   local privtar=""
-  mountdir=/media/rpi3util
+  mountdir=/media
   if [ ! -d ${mountdir} ]
     then
     mkdir -p ${mountdir}
@@ -78,9 +79,9 @@ function runScripts {
   [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..." && return
   ${projdir}/bin/rpi3_ap_setup.sh bramble rpi3sg
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
-  ${projdir}/bin/postfix_main.sh
-  ${projdir}/bin/postfix_aliases.sh
-  ${projdir}/bin/postfix_test.sh
+  #${projdir}/bin/postfix_main.sh
+  #${projdir}/bin/postfix_aliases.sh
+  #${projdir}/bin/postfix_test.sh
   touch ${runScripts_lck}
   echo "completed runScripts"
 }
@@ -105,13 +106,23 @@ function installEtcRuntimeTar {
   tar xvf ${etc_runtime_tar} -C /
   echo "${etc_runtime_tar} installed"
   echo "completed installEtcRuntimeTar"
+  touch ${etcInstall_lck}
 }
 
 # Main Program
-[[ $# -eq 1 ]] && echo -n "Setting hostname to $1" && hostname=$1
-init $hostname
-runScripts
-getPrivateTar private_tar
-createTar public_tar ${projdir} ${logdir} "public" "etc"
-installEtcRuntimeTar ${private_tar} ${public_tar}
-#reboot
+if [ ! -f ${etcInstall_lck} ]
+then
+  [[ $# -eq 1 ]] && echo -n "Setting hostname to $1" && hostname=$1
+  init $hostname
+  getPrivateTar private_tar
+  createTar public_tar ${projdir} ${logdir} "public" "etc"
+  installEtcRuntimeTar ${private_tar} ${public_tar}
+  reboot
+fi
+
+conn=$(ping -q -w 2 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)
+if [ "$conn" == "ok" ]
+then
+  runScripts
+  reboot
+fi
