@@ -57,17 +57,9 @@ function getPrivateTar {
 
 function init {
   echo "executing init"
-  if [ -z $1 ]
-  then
-    hname=$1
-    echo -n "Setting hostname to ${hname}"
-    regex=$("\"s/black-pearl/${hname}/\"")
-    perl -p -i -e "${regex}" /etc/hosts
-    perl -p -i -e "${regex}" /etc/hostname
-    /etc/init.d/hostname.sh
-    echo "Done"
-  fi
-
+  me=$(whoami)
+  [[ "${me}" != "root" ]] && echo "Please execute as root." && exit
+  chmod u+s /bin/ping
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
   echo "enable_uart=1" >> /boot/config.txt
@@ -123,6 +115,7 @@ fi
 conn=$(ping -q -w 2 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)
 if [ "$conn" == "ok" ]
 then
+  apt-get update
   runScripts
   reboot
 fi
