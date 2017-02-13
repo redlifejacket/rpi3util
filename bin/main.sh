@@ -124,6 +124,12 @@ conn=$(ping -q -w 2 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && 
 if [ "$conn" == "ok" ]
 then
   apt-get update
+  dns_conf=/etc/dnsmasq.conf
+  dnsmasq_conf_before=${homedir}/log/dnsmasq.conf.before.${runtime}
+  dnsmasq_conf_after=${homedir}/log/dnsmasq.conf.after.${runtime}
+  cp ${dns_conf} ${dnsmasq_conf_before}
   runScripts
+  cp ${dns_conf} ${dnsmasq_conf_after}
+  cp ${dnsmasq_conf_before} ${dns_conf}
   reboot
 fi
