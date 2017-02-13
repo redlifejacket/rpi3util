@@ -69,7 +69,8 @@ function init {
   user_profile=/etc/user.profile
   profile_setting="[[ -f ${user_profile} ]] && . ${user_profile}"
   ret=$(tail -1 ${user_profile})
-  [[ "${ret}" != "${user_setting}" ]] && echo "${user_setting}" >> ${user_profile}
+  bashrc=${homedir}/.bashrc
+  [[ "${ret}" != "${profile_setting}" ]] && echo "${profile_setting}" >> ${bashrc}
   echo "completed init"
 }
 
