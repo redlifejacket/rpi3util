@@ -62,7 +62,14 @@ function init {
   chmod u+s /bin/ping
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
-  echo "enable_uart=1" >> /boot/config.txt
+  boot_config=/boot/config.txt
+  uart_setting="enable_uart=1"
+  ret=$(tail -1 ${boot_config})
+  [[ "${ret}" != "${uart_setting}" ]] && echo "${uart_setting}" >> ${boot_config}
+  user_profile=/etc/user.profile
+  profile_setting="[[ -f ${user_profile} ]] && . ${user_profile}"
+  ret=$(tail -1 ${user_profile})
+  [[ "${ret}" != "${user_setting}" ]] && echo "${user_setting}" >> ${user_profile}
   echo "completed init"
 }
 
