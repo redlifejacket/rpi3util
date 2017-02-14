@@ -159,7 +159,7 @@ function installWap {
     cp ${dnsmasq_conf_before} ${dns_conf}
     reboot
   else
-    echo "${runScripts_lck}: Please delete lock file and re-execute"
+    echo "Please check internet connectivity..."
   fi
 }
 
@@ -195,9 +195,6 @@ function parseArgs {
     shift
   done
 
-  echo "opt_config: ${opt_config}"
-  echo "opt_wap: ${opt_wap}"
-  echo "opt_mount: ${opt_mount}"
   if [ -n "$opt_config" ] && [ -n "$opt_wap" ]; then
     usage
   elif [ -n "$opt_config" ]; then
@@ -210,5 +207,4 @@ function parseArgs {
 }
 
 # Main Program
-#init
 parseArgs $@
