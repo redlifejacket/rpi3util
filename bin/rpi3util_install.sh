@@ -68,11 +68,13 @@ function init {
   echo "executing init"
   me=$(whoami)
   [[ "${me}" != "root" ]] && echo "Please execute as root." && exit
-  if [ ! -d ${mountdir}/private ]
+  ret=$(grep ${mount_device} /etc/fstab)
+  if [ -z "${ret}" ]
     then
-    echo "Mounting ${mount_device} to ${mountdir}"
+    echo -n "Mounting ${mount_device} to ${mountdir}..."
     echo "${mount_device} ${mountdir} vfat user,owner,utf8,rw,umask=000 0 0" >> /etc/fstab
     mount -a
+    echo "Done"
   fi
   exec 3>&1 1>>${logfile} 2>&1
   chmod u+s /bin/ping
