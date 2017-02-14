@@ -133,7 +133,7 @@ function installEtcRuntimeTar {
 function installConfig {
   if [ ! -f ${etcInstall_lck} ]
   then
-    init $hostname
+    init
     getPrivateTar private_tar
     createTar public_tar ${projdir} ${logdir} "public" "etc"
     installEtcRuntimeTar ${private_tar} ${public_tar}
