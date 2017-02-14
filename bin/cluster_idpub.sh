@@ -1,6 +1,6 @@
 #!/bin/bash
 
-iplist=$(grep rpi3 /etc/dhcp.machines | awk -F',' '{print $2}')
+iplist=$(grep rpi /etc/dhcp.machines | awk -F',' '{print $2}')
 
 echo "iplist: ${iplist}"
 
