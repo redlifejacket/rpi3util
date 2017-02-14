@@ -68,7 +68,7 @@ function init {
   echo "executing init"
   me=$(whoami)
   [[ "${me}" != "root" ]] && echo "Please execute as root." && exit
-  if [ ! -d ${mountdir} ]
+  if [ ! -d ${mountdir}/private ]
     then
     echo "Mounting ${mount_device} to ${mountdir}"
     echo "${mount_device} ${mountdir} vfat user,owner,utf8,rw,umask=000 0 0" >> /etc/fstab
