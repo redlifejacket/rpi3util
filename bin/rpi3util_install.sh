@@ -1,5 +1,4 @@
 #!/bin/bash
-
 homedir=${HOME}
 logdir=${homedir}/log
 [[ ! -d ${logdir} ]] && mkdir ${logdir}
@@ -7,9 +6,26 @@ runtime=$(date +%Y%m%d%H%M%S)
 logfile="${logdir}/rpi3util_${runtime}.log"
 projname=rpi3util
 projdir=${homedir}/${projname}
+mountdir=/media/${projname}
 etc_runtime=${logdir}/etc_${runtime}
 runScripts_lck=${logdir}/runScripts.lck
 etcInstall_lck=${logdir}/etcInstall.lck
+mount_device=/dev/sda1
+wap_ssid=rpi3sg
+wap_password=bramble1234
+
+function usage {
+  echo "Usage: $0 -c|--config [-m|--mount mount_device_usb]"
+  echo "       $0 -w|--wap [-s|--ssid SSID] [-p|--password PASSWORD]"
+  echo "       $0 -h|--help"
+  echo "where: -c|--config:   Installs config files"
+  echo "       -m|--mount:    Mount device (defaults to ${mount_device})"
+  echo "       -w|--wap:      Sets up a wireless access point"
+  echo "       -s|--ssid:     WiFi SSID (defaults to ${wap_ssid})"
+  echo "       -p|--password: Wifi Password"
+  echo "       -h|--help:     Displays this message"
+  exit;
+}
 
 function createTar {
   echo "executing createTar"
@@ -43,13 +59,6 @@ function getPrivateTar {
   echo "executing getPrivateTar"
   local __resultvar=$1
   local privtar=""
-  mountdir=/media/${projname}
-  if [ ! -d ${mountdir} ]
-    then
-    mkdir -p ${mountdir}
-    echo "/dev/sda1 ${mountdir} vfat user,owner,utf8,rw,umask=000 0 0" >> /etc/fstab
-    mount -a
-  fi
   createTar privtar ${mountdir}/private ${logdir} "private" "etc"
   eval $__resultvar="${privtar}"
   echo "completed getPrivateTar"
@@ -59,6 +68,12 @@ function init {
   echo "executing init"
   me=$(whoami)
   [[ "${me}" != "root" ]] && echo "Please execute as root." && exit
+  if [ ! -d ${mountdir} ]
+    then
+    echo "Mounting ${mount_device} to ${mountdir}"
+    echo "${mount_device} ${mountdir} vfat user,owner,utf8,rw,umask=000 0 0" >> /etc/fstab
+    mount -a
+  fi
   exec 3>&1 1>>${logfile} 2>&1
   chmod u+s /bin/ping
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
@@ -81,7 +96,7 @@ function init {
 function runScripts {
   echo "executing runScripts"
   [[ -f ${runScripts_lck} ]] && echo "${runScripts_lck} exists... skipping..." && return
-  ${projdir}/bin/rpi3_ap_setup.sh bramble1234 rpi3sg
+  ${projdir}/bin/rpi3_ap_setup.sh ${wap_password} ${wap_ssid}
   ${projdir}/bin/adapter_passthrough.sh wlan1 eth0
   #${projdir}/bin/postfix_main.sh
   #${projdir}/bin/postfix_aliases.sh
@@ -113,27 +128,85 @@ function installEtcRuntimeTar {
   touch ${etcInstall_lck}
 }
 
-# Main Program
-if [ ! -f ${etcInstall_lck} ]
-then
-  [[ $# -eq 1 ]] && echo -n "Setting hostname to $1" && hostname=$1
-  init $hostname
-  getPrivateTar private_tar
-  createTar public_tar ${projdir} ${logdir} "public" "etc"
-  installEtcRuntimeTar ${private_tar} ${public_tar}
-  reboot
-fi
+function installConfig {
+  if [ ! -f ${etcInstall_lck} ]
+  then
+    init $hostname
+    getPrivateTar private_tar
+    createTar public_tar ${projdir} ${logdir} "public" "etc"
+    installEtcRuntimeTar ${private_tar} ${public_tar}
+    reboot
+  else 
+    echo "${etcInstall_lck}: Please delete lock file and re-execute"
+  fi
+}
 
-conn=$(ping -q -w 2 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)
-if [ "$conn" == "ok" ]
-then
-  apt-get update
-  dns_conf=/etc/dnsmasq.conf
-  dnsmasq_conf_before=${homedir}/log/dnsmasq.conf.before.${runtime}
-  dnsmasq_conf_after=${homedir}/log/dnsmasq.conf.after.${runtime}
-  cp ${dns_conf} ${dnsmasq_conf_before}
-  runScripts
-  cp ${dns_conf} ${dnsmasq_conf_after}
-  cp ${dnsmasq_conf_before} ${dns_conf}
-  reboot
-fi
+function installWap {
+  conn=$(ping -q -w 2 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)
+  if [ "$conn" == "ok" ]
+  then
+    echo "Logging output to ${logfile}..."
+    exec 3>&1 1>>${logfile} 2>&1
+    apt-get update
+    dns_conf=/etc/dnsmasq.conf
+    dnsmasq_conf_before=${homedir}/log/dnsmasq.conf.before.${runtime}
+    dnsmasq_conf_after=${homedir}/log/dnsmasq.conf.after.${runtime}
+    cp ${dns_conf} ${dnsmasq_conf_before}
+    runScripts
+    cp ${dns_conf} ${dnsmasq_conf_after}
+    cp ${dnsmasq_conf_before} ${dns_conf}
+    reboot
+  else
+    echo "${etcInstall_lck}: Please delete lock file and re-execute"
+  fi
+}
+
+function parseArgs {
+  while [[ $# -ge 1 ]]
+  do
+    key="$1"
+    case $key in
+      -h|--help)
+        usage
+        ;;
+      -c|--config)
+        opt_config="true"
+        ;;
+      -m|--mount)
+        mount_device=$2
+        shift
+        ;;
+      -w|--wap)
+        opt_wap="true"
+        ;;
+      -s|--ssid)
+        wap_ssid=$2
+        shift
+        ;;
+      -p|--password)
+        wap_password=$2
+        shift
+        ;;
+      *)
+        ;;
+    esac
+    shift
+  done
+
+  echo "opt_config: ${opt_config}"
+  echo "opt_wap: ${opt_wap}"
+  echo "opt_mount: ${opt_mount}"
+  if [ -n "$opt_config" ] && [ -n "$opt_wap" ]; then
+    usage
+  elif [ -n "$opt_config" ]; then
+    installConfig
+  elif [ -n "$opt_wap" ]; then
+    installWap
+  else
+    usage
+  fi
+}
+
+# Main Program
+#init
+parseArgs $@
