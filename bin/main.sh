@@ -10,7 +10,6 @@ projdir=${homedir}/${projname}
 etc_runtime=${logdir}/etc_${runtime}
 runScripts_lck=${logdir}/runScripts.lck
 etcInstall_lck=${logdir}/etcInstall.lck
-exec 3>&1 1>>${logfile} 2>&1
 
 function createTar {
   echo "executing createTar"
@@ -60,6 +59,7 @@ function init {
   echo "executing init"
   me=$(whoami)
   [[ "${me}" != "root" ]] && echo "Please execute as root." && exit
+  exec 3>&1 1>>${logfile} 2>&1
   chmod u+s /bin/ping
   perl -p -i -e "s/country=GB/country=AU/" /etc/wpa_supplicant/wpa_supplicant.conf
   touch /boot/ssh
@@ -69,9 +69,12 @@ function init {
   [[ "${ret}" != "${uart_setting}" ]] && echo "${uart_setting}" >> ${boot_config}
   user_profile=/etc/user.profile
   profile_setting="[[ -f ${user_profile} ]] && . ${user_profile}"
-  ret=$(tail -1 ${user_profile})
-  bashrc=${homedir}/.bashrc
-  [[ "${ret}" != "${profile_setting}" ]] && echo "${profile_setting}" >> ${bashrc}
+  for f in ${homedir} /home/*
+  do
+    bashrc=${f}/.bashrc
+    ret=$(tail -1 ${bashrc})
+    [[ "${ret}" != "${profile_setting}" ]] && echo "${profile_setting}" >> ${bashrc}
+  done
   echo "completed init"
 }
 
