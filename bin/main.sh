@@ -5,7 +5,8 @@ logdir=${homedir}/log
 [[ ! -d ${logdir} ]] && mkdir ${logdir}
 runtime=$(date +%Y%m%d%H%M%S)
 logfile="${logdir}/rpi3util_${runtime}.log"
-projdir=${homedir}/rpi3util
+projname=rpi3util
+projdir=${homedir}/${projname}
 etc_runtime=${logdir}/etc_${runtime}
 runScripts_lck=${logdir}/runScripts.lck
 etcInstall_lck=${logdir}/etcInstall.lck
@@ -43,7 +44,7 @@ function getPrivateTar {
   echo "executing getPrivateTar"
   local __resultvar=$1
   local privtar=""
-  mountdir=/media
+  mountdir=/media/${projname}
   if [ ! -d ${mountdir} ]
     then
     mkdir -p ${mountdir}
