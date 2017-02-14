@@ -157,7 +157,7 @@ function installWap {
     cp ${dnsmasq_conf_before} ${dns_conf}
     reboot
   else
-    echo "${etcInstall_lck}: Please delete lock file and re-execute"
+    echo "${runScripts_lck}: Please delete lock file and re-execute"
   fi
 }
 
