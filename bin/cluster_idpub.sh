@@ -1,11 +1,13 @@
 #!/bin/bash
 
-iplist=$(grep rpi /etc/dhcp.machines | awk -F',' '{print $2}')
+iplist=$(grep rpi /etc/dhcp.machines | awk -F',' '{print $3}')
+user=pirate
+homedir=/home/${user}
 
 echo "iplist: ${iplist}"
 
 for ip in ${iplist}
 do
-  scp /home/pi/.ssh/id_rsa.pub pi@${ip}:/home/pi/.ssh/authorized_keys
+  scp ${homedir}/.ssh/id_rsa.pub pirate@${ip}:${homedir}/.ssh/authorized_keys
 done
 
