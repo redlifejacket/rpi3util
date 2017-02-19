@@ -64,8 +64,8 @@ sed -i -- 's/allow-hotplug wlan0//g' /etc/network/interfaces
 sed -i -- 's/iface wlan0 inet manual//g' /etc/network/interfaces
 sed -i -- 's/    wpa-conf \/etc\/wpa_supplicant\/wpa_supplicant.conf//g' /etc/network/interfaces
 
+  #wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 cat >> /etc/network/interfaces <<EOF
-  wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
 
 # Added by rPi Access Point Setup
 allow-hotplug wlan0

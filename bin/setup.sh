@@ -64,6 +64,13 @@ function getPrivateTar {
   echo "completed getPrivateTar"
 }
 
+function setLocale {
+  echo "executing setLocale"
+	locale-gen en_AU.UTF-8
+	localedef -i en_AU -f UTF-8 en_AU.UTF-8
+  echo "completed setLocale"
+}
+
 function init {
   echo "executing init"
   me=$(whoami)
@@ -92,6 +99,7 @@ function init {
     ret=$(tail -1 ${bashrc})
     [[ "${ret}" != "${profile_setting}" ]] && echo "${profile_setting}" >> ${bashrc}
   done
+	setLocale
   echo "completed init"
 }
 
